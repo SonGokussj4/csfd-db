@@ -1,7 +1,9 @@
 PYTHON=python3.11
 VENV=.venv
+
 PIP=$(VENV)/bin/pip
 UVICORN=$(VENV)/bin/uvicorn
+RUFF=$(VENV)/bin/ruff
 
 
 .PHONY: all help venv venv-dev clean run
@@ -30,3 +32,6 @@ clean:
 
 run:
 	$(UVICORN) app.main:app --reload
+
+ruff:
+	$(RUFF) check
