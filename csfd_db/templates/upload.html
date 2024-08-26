@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+
+    <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
+    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+    <h1>Upload</h1>
+    <!-- <form method="POST" action="http://localhost:8000/uploadfile" enctype="multipart/form-data"> -->
+    <form action="/uploadfile" class="dropzone" id="my-awesome-dropzone">
+        <div class="fallback">
+            <input name="file" type="file" multiple />
+        </div>
+    </form>
+    <script>
+        let myDropzone = new Dropzone("#my-awesome-dropzone", {
+            paramName: "file_upload",
+        });
+    </script>
+</body>
+
+</html>
