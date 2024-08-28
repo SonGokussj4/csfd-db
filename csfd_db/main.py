@@ -4,9 +4,13 @@ import sys
 from pathlib import Path
 
 from aiofiles import open as aio_open
-from fastapi import FastAPI, Request, UploadFile
+from fastapi import Depends, FastAPI, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
+
+from csfd_db import auth, models, schemas
+from csfd_db.db import engine
+from csfd_db.routes import router
 
 UPLOAD_DIR = Path().cwd() / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -21,7 +25,6 @@ app = FastAPI(
     swagger_ui_parameters={
         "tryItOutEnabled": True,
         "displayRequestDuration": True,
-        "displayOperationId": True,
     },
 )
 
@@ -34,8 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+models.Base.metadata.create_all(bind=engine)
+app.include_router(router)
 
-@app.get("/", include_in_schema=False)
+
+@app.get("/", dependencies=[Depends(auth.get_current_user)], include_in_schema=False)
 async def root():
     current_python_version = sys.version
     return {"message": "Hi there, hello", "python_version": current_python_version}
@@ -47,15 +53,18 @@ async def healthcheck():
     return {"status": "ok"}
 
 
-@app.get("/uploadfile")
+@app.get("/auth-check/")
+async def auth_check(current_user: schemas.UserInDB = Depends(auth.get_current_user)):
+    return current_user
+
+
+@app.get("/uploadfile", dependencies=[Depends(auth.get_current_user)])
 async def upload_file(request: Request):
-    return {"Unauthorized": "You are not authorized to upload files"}
     return templates.TemplateResponse("upload.html", {"request": request})
 
 
-@app.post("/uploadfile")
+@app.post("/uploadfile", dependencies=[Depends(auth.get_current_user)])
 async def handle_file_upload(file_upload: UploadFile):
-    return {"Unauthorized": "You are not authorized to upload files"}
     data = await file_upload.read()
     save_to = UPLOAD_DIR / file_upload.filename
 
