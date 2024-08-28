@@ -49,11 +49,13 @@ async def healthcheck():
 
 @app.get("/uploadfile")
 async def upload_file(request: Request):
+    return {"Unauthorized": "You are not authorized to upload files"}
     return templates.TemplateResponse("upload.html", {"request": request})
 
 
 @app.post("/uploadfile")
 async def handle_file_upload(file_upload: UploadFile):
+    return {"Unauthorized": "You are not authorized to upload files"}
     data = await file_upload.read()
     save_to = UPLOAD_DIR / file_upload.filename
 
